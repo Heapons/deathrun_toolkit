@@ -694,7 +694,8 @@ bool ActivatorBan(int steam_account)
 {
 	int client = GetClientFromSteamAccount(steam_account);
 
-	if (client != 0)
+	// client is on server
+	if (client > 0)
 	{
 		DRPlayer(client).ActivatorBanned = true;
 		return DRPlayer(client).SaveData();

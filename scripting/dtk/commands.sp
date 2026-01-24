@@ -308,7 +308,7 @@ Action AdminCommand_RemoveDBRecord(int client, int args) {
 	GetCmdArgString(arg_string, sizeof(arg_string));
 	BreakString(arg_string, authid, sizeof(authid));
 
-	int steam_account = GetSteamAccountIdFromSteamId(authid);
+	int steam_account = SteamIdToAccount(authid);
 
 	if (steam_account == 0) {
 		ReplyToCommand(client, "%t: %s", "Invalid SteamID specified", authid);
@@ -355,7 +355,7 @@ Action AdminCommand_AddActivatorBan(int client, int args) {
 	GetCmdArgString(arg_string, sizeof(arg_string));
 	BreakString(arg_string, authid, sizeof(authid));
 
-	int steam_account = GetSteamAccountIdFromSteamId(authid);
+	int steam_account = SteamIdToAccount(authid);
 
 	if (steam_account == 0) {
 		ReplyToCommand(client, "%t: %s", "Invalid SteamID specified", authid);
@@ -390,7 +390,7 @@ Action AdminCommand_RemActivatorBan(int client, int args) {
 	GetCmdArgString(arg_string, sizeof(arg_string));
 	BreakString(arg_string, authid, sizeof(authid));
 
-	int steam_account = GetSteamAccountIdFromSteamId(authid);
+	int steam_account = SteamIdToAccount(authid);
 
 	if (steam_account == 0) {
 		ReplyToCommand(client, "%t: %s", "Invalid SteamID specified", authid);
@@ -424,7 +424,7 @@ Action AdminCommand_IsActivatorBanned(int client, int args) {
 	GetCmdArgString(arg_string, sizeof(arg_string));
 	BreakString(arg_string, authid, sizeof(authid));
 
-	int steam_account = GetSteamAccountIdFromSteamId(authid);
+	int steam_account = SteamIdToAccount(authid);
 
 	if (steam_account == 0) {
 		ReplyToCommand(client, "%t: %s", "Invalid SteamID specified", authid);

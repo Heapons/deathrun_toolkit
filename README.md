@@ -9,6 +9,7 @@ Deathrun Toolkit is a set of plugins which run and support the Deathrun game mod
 * [SteamWorks](https://forums.alliedmods.net/showthread.php?t=229556) extension for changing the server's game description
 * [Source Chat Relay](https://forums.alliedmods.net/showthread.php?p=2617899) for printing deathrun game mode information to Discord channels
 * TF2Items is used for providing replacement weapons if present but the plugin will work fine without it
+Please note these plugins are required if you wish to compile the plugin yourself. 
 ### Quick Setup
 Upload these two files to your server's SourceMod installation
 * `addons/sourcemod/plugins/dtk.smx`

@@ -1,7 +1,9 @@
+// #define DEBUG
 
 #include <sourcemod>
 #include <sdktools>
 #include <sdkhooks>
+#include <m_stocks>
 
 // clang-format off
 #undef REQUIRE_PLUGIN
@@ -16,7 +18,7 @@
 
 // ----------------------------------------------------------------------------------------------------
 
-#define PLUGIN_VERSION			"0.5.5"
+#define PLUGIN_VERSION			"0.5.5.1"
 #define PLUGIN_NAME				"[DTK] Deathrun Toolkit"
 #define PLUGIN_SHORTNAME		"Deathrun Toolkit"
 
@@ -63,7 +65,6 @@ StringMap  g_Sounds;
 #include "dtk/items.sp"
 #include "dtk/menus.sp"
 #include "dtk/methodmaps.sp"
-#include "dtk/stocks.sp"
 
 // ----------------------------------------------------------------------------------------------------
 public Plugin myinfo =

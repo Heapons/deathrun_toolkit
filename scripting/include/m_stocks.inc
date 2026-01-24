@@ -1,11 +1,16 @@
-// Matty's stocks v1.2
+// Matty's stocks v1.3
 
 /*
 	Changelog
-		Version 1.1
-			* GetEntityParent
-			* GetEntityAbsOrigin;
-		Version 1.2
+		1.3.1
+			* New enum: SteamIdType
+			* New function: SteamIdToAccount takes a Steamid string and returns the account number, and stores the type in a by-reference arg
+			* GetClientFromSteamAccount returns -1 when not found, instead of 0
+		1.3
+			* Improved TF2_PrintToChat and other SayText2 functions' descriptions
+			* Improved FindTargets return value description
+			* Added Steam id functions from my DTK steamid script
+		1.2
 			* Cleanup
 			* FindEnts function
 			* FindTargets function
@@ -13,7 +18,15 @@
 			* EntityResult enum struct
 			* Transform enum struct
 			* IsStringNumeric function treats * as alphabetical
+		1.1
+			* GetEntityParent
+			* GetEntityAbsOrigin;
 */
+
+#if defined _matty_stocks_included
+	#endinput
+#endif
+#define _matty_stocks_included
 
 #include <regex>
 #include <tf2_stocks>
@@ -133,7 +146,7 @@ static bool g_bIsGameDetermined;
  * Called whenever a game check is made.
  * First time this runs it determines the game.
  */
-stock void DetermineGame() {
+stock void	DetermineGame() {
 	 if (!g_bIsGameDetermined) {
 		 char game_folder[32];
 		 GetGameFolderName(game_folder, sizeof(game_folder));
@@ -397,16 +410,19 @@ stock int PickRandomTeamMember(int team) {
 }
 
 /**
- * A wrapper for ProcessTargetString which puts results in an ArrayList,
- * optionally shuffles them and supports extra flags:
+ * A wrapper for ProcessTargetString which pushes resulting client indexes to the given ArrayList.
+ * The function supports an extra flag:
  * COMMAND_FILTER_PARTICIPATING: Only return clients who are on a non-spec team (i.e. participating in the match).
  *
- * @param	pattern		Targetting pattern to match players by. e.g. a name or MTF like @red
+ * @param	pattern		Pattern to find clients against.
  * @param	admin		Client index of admin performing the search (required by ProcessTargetString)
  * @param	flags		Filter flags, found in commandfilters.inc
  * @param	targets		ArrayList to store target client indexes
- * @param	shuffle		Whether to shuffle the results
- * @return	Number of targets found
+ * @param	shuffle		True to shuffle the entire contents of the ArrayList after adding to it
+ * @return	If a multi-target pattern was used, the number of clients found
+ *          is returned.  If a single-target pattern was used, 1 is returned
+ *          if one valid client is found.  Otherwise, a COMMAND_TARGET reason
+ *          for failure is returned.
  */
 stock int FindTargets(const char[] pattern, int admin, int flags, ArrayList targets, bool shuffle = false) {
 	bool tn_is_ml;
@@ -744,13 +760,27 @@ stock bool ShowAnnotation(int client, int entity, const char[] sound = "", const
 
 	return true;
 }
+/*
+	Note about team colouring chat messages:
+
+	In TF2, such chat strings are constructed like so:
+		<player> performed some action/had something happen to them
+	Where the <player> name is in their team's colour.
+
+	If the recipient client is the only one to receive the message, and they are the player in question,
+	then it is more appropriate to use an uncoloured, direct approach:
+		You performed some action/had something happen to you.
+
+	Stick to the 'native' TF2 style for more authenticity and immersion, and avoid using colour too often.
+*/
 
 /**
- * Sends a SayText2 User Message to a client which team-colours text when \x02 or \x03 are used in the string.
+ * A replacement for PrintToChat which uses TF2's SayText2 user message.
+ * This lets you easily add team colour by prefixing \x02 or \x03.
+ * The client specified in the colorClient argument will be used for the team colour.
  *
- * Guidelines: colorClient should not be used to colour the recipient's name, and they should not be referred to in the third person.
- * This parameter should be used to colour the name of another client who has done something the recipient needs to be aware of.
- * For example, they are the recipient's killer, or they granted them a bonus or performed some action.
+ * Please see the note in the stock file above these functions for more information on the
+ * best way to format messages.
  *
  * @param	client			Recipient client index
  * @param	colorClient		Team-coloured text will use this client's team, or light green if left blank
@@ -776,12 +806,14 @@ stock void TF2_PrintToChat(int client, int colorClient = 0, const char[] format,
 }
 
 /**
- * Sends a SayText2 User Message to a client which team-colours text when \x02 or \x03 are used in the string.
- * Additionally specify up to two Source translation keys, and the game will translate them into the user's local language.
+ * A replacement for PrintToChat which uses TF2's SayText2 user message.
+ * This lets you easily add team colour by prefixing \x02 or \x03.
+ * The client specified in the colorClient argument will be used for the team colour.
  *
- * Guidelines: colorClient should not be used to colour the recipient's name, and they should not be referred to in the third person.
- * This parameter should be used to colour the name of another client who has done something the recipient needs to be aware of.
- * For example, they are the recipient's killer, or they granted them a bonus or performed some action.
+ * Ex: Additionally specify up to two Source translation keys, and the game will translate them into the user's local language.
+ *
+ * Please see the note in the stock file above these functions for more information on the
+ * best way to format messages.
  *
  * @param	client			Recipient client index
  * @param	colorClient		Team-coloured text will use this client's team, or light green if left blank
@@ -818,12 +850,13 @@ stock void TF2_PrintToChatEx(int client, int colorClient = 0, const char[] trans
 }
 
 /**
- * Sends a SayText2 User Message to a client which team-colours text when \x02 or \x03 are used in the string.
- * If the command was issued from the console, the reply is sent there.
+ * A replacement for ReplyToCommand which uses TF2's SayText2 user message in chat responses.
+ * This lets you easily add team colour by prefixing \x02 or \x03.
+ * The client specified in the colorClient argument will be used for the team colour.
+ * If the command was issued from the console, the reply is sent there and no colours are added.
  *
- * Guidelines: colorClient should not be used to colour the recipient's name, and they should not be referred to in the third person.
- * This parameter should be used to colour the name of another client who has done something the recipient needs to be aware of.
- * For example, they are the recipient's killer, or they granted them a bonus or performed some action.
+ * Please see the note in the stock file above these functions for more information on the
+ * best way to format messages.
  *
  * @param	client			Recipient client index
  * @param	colorClient		Team-coloured text will use this client's team, or light green if left blank
@@ -854,7 +887,13 @@ stock void TF2_ReplyToCommand(int client, int colorClient = 0, const char[] form
 }
 
 /**
- * Sends a SayText2 User Message to all clients, which team-colours text when \x02 or \x03 are used in the string.
+ * A replacement for PrintToChat which uses TF2's SayText2 user message.
+ * This lets you easily add team colour by prefixing \x02 or \x03.
+ * The client specified in the colorClient argument will be used for the team colour.
+ *
+ * Please see the note in the stock file above these functions for more information on the
+ * best way to format messages.
+ *
  * @param	colorClient		Team-coloured text will use this client's team, or light green if left blank
  * @param	format			Formatting rules
  * @param	any				Variable number of formatting parameters
@@ -994,3 +1033,120 @@ stock void PrecacheAssets(StringMap stringmap) {
 
 	delete snapshot;
 }
+
+/**
+ * Steam Id
+ * ----------------------------------------------------------------------------------------------------
+ */
+
+enum SteamIdType {
+	SteamIdType_Unknown,
+	SteamIdType_Steam2,	   // STEAM_0:0:523696
+	SteamIdType_Steam3	   // [U:1:1047392]
+}
+
+/**
+ * Given a string containing a steam id, converts it to an account number.
+ * Sets the SteamIdType in an argument passed by reference.
+ * Supports: steam2 (STEAM_0:0:523696) and steam3 ([U:1:1047392])
+ *
+ * @param	steamid		Steam id string
+ * @param	type		SteamIdType by reference variable. SteamIsType_Unknown if type not recognized
+ * @return Steam account int or 0 if not recognized
+ */
+stock int
+	SteamIdToAccount(const char[] steamid, SteamIdType &type = SteamIdType_Unknown) {
+	int	  account = 0;
+
+	// steam2
+	Regex exp	  = new Regex("^STEAM_[0-5]:[0-1]:[0-9]+$");
+	int	  matches = exp.Match(steamid);
+	delete exp;
+
+	if (matches == 1) {	   // steam2 id recognized
+		type = SteamIdType_Steam2;
+		return StringToInt(steamid[10]) * 2 + (steamid[8] - 48);	// return account number
+	}
+
+	// steam3
+	exp		= new Regex("^\\[U:1:\\d+]$");
+	matches = exp.Match(steamid);
+	delete exp;
+
+	if (matches == 1) {	   // steam3 id recognized
+		type   = SteamIdType_Steam3;
+		int	 i = 5;
+		char account_number[64];
+
+		while (steamid[i] != ']' && steamid[i] != '\0') {
+			Format(account_number, sizeof(account_number), "%s%c", account_number, steamid[i]);
+			i++;
+		}
+
+		return StringToInt(account_number);	   // return account number
+	}
+
+	return account;
+}
+
+/**
+ * Convert a Steam3 id to a Steam2 id
+ *
+ * Steam3: [U:1:1047392]
+ * Steam2: STEAM_0:0:523696
+ *
+ * @param	steamid3	Steam3 id
+ * @param	steamid2	Output Steam2 id
+ * @return	Number of characters written to steamid2
+ */
+stock int GetSteam2FromSteam3(const char[] steamid3, char[] steamid2) {
+	int	 len;
+	char buffer[64];
+	int	 account_id = SteamIdToAccount(steamid3);
+	int	 remainder	= account_id % 2;
+
+	if (account_id == 0) {
+		return 0;
+	}
+
+	len = 1 + Format(buffer, sizeof(buffer), "STEAM_0:%d:%d", remainder, (account_id - remainder) / 2);
+	strcopy(steamid2, len, buffer);
+
+	return len;
+}
+
+/**
+ * Check clients for a matching Steam account number.
+ * @param	account		Steam account number
+ * @return	Client index if found, else -1
+ */
+stock int GetClientFromSteamAccount(int account) {
+	for (int i = 1; i <= MaxClients; i++) {
+		if (IsClientInGame(i) && !IsFakeClient(i)) {
+			int account_id = GetSteamAccountID(i);
+
+			if (account_id == account) {
+				return i;
+			}
+		}
+	}
+
+	return -1;
+}
+
+/*
+	Thank you, 'Illusion9', for your info on the Am forum:
+	https://forums.alliedmods.net/showthread.php?t=324112
+
+	Steamid64 testing notes:
+	Steam id 64: 76561197961313120
+	0000000100010000000000000000000100000000000011111111101101100000
+
+	STEAM_X:Y:Z
+	Universe Type Instance             Account number ----------------->
+	00000001 0001 00000000000000000001 0000000000001111111110110110000 0
+	X                                  Z                               Y
+
+	No information on instances
+	Type 1 equates to U in Steam3 format
+*/

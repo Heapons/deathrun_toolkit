@@ -43,7 +43,8 @@ Action Timer_RoundRestarted(Handle timer) {
 	return Plugin_Stop;
 }
 
-static Handle g_hNextActivator;
+// next activator chat message timer
+static Handle g_hTimer_NextActivator;
 
 void		  Event_RoundStart(Event event, const char[] name, bool dontBroadcast) {
 	 g_bInWatchMode = false;	// No need to watch for team changes now
@@ -70,13 +71,14 @@ void		  Event_RoundStart(Event event, const char[] name, bool dontBroadcast) {
 	 }
 
 	 // Start next activator message timer
-	 delete g_hNextActivator;
-	 g_hNextActivator = CreateTimer(TIMER_NA_MESSAGE, Timer_NextActivator_Message, _, TIMER_REPEAT);
+	 delete g_hTimer_NextActivator;
+	 g_hTimer_NextActivator = CreateTimer(TIMER_NA_MESSAGE, Timer_NextActivator_Message, _, TIMER_REPEAT);
 }
 
 Action Timer_NextActivator_Message(Handle timer, any data) {
-	if (!IsDeathrunRoundActive()) {
-		g_hNextActivator = null;
+	// stop timer if plugin is disabled or deathrun round not running
+	if (!g_ConVars[P_Enabled].BoolValue || !IsDeathrunRoundActive()) {
+		g_hTimer_NextActivator = null;
 		return Plugin_Stop;
 	}
 

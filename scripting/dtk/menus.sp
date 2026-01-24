@@ -33,7 +33,8 @@ stock void MenuFunction(int client, const char[] selection)
 		menu.AddItem("menu_queue", "menu_item_queue");
 		menu.AddItem("item_help", "menu_item_help");
 		
-		if (GetAdminFlags(GetUserAdmin(client), Access_Effective))
+		// admin menu access check
+		if (GetAdminFlag(GetUserAdmin(client), Admin_Slay))
 		{
 			menu.AddItem("menu_admin", "menu_item_admin");
 		}

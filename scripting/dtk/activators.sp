@@ -1,5 +1,4 @@
 
-#include "dtk/steamid.sp"	// for banning
 
 /**
  * Player Allocation
@@ -136,7 +135,7 @@ ArrayList CreateActivatorPool()
 	int		  len, pool;
 	bool	  use_all;
 
-	// get array of willing players
+	// count willing, unbanned players
 	for (int i = 1; i <= MaxClients; i++) {
 		DRPlayer player = DRPlayer(i);
 
