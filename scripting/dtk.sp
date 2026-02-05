@@ -143,7 +143,7 @@ public void OnConfigsExecuted() {
 		char mapname[32];
 		GetCurrentMap(mapname, sizeof(mapname));
 
-		if (StrContains(mapname, "dr_", false) != -1 || StrContains(mapname, "deathrun_", false) != -1)
+		if (StrContains(mapname, "dr_", false) == 0 || StrContains(mapname, "deathrun_", false) == 0)
 			g_ConVars[P_Enabled].SetBool(true);
 	}
 }
